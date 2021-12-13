@@ -46,12 +46,16 @@ public class MainController {
     
     //FIND ONE AND RETURN TO JSP THROUGH ADD ATTRIBUTE
     @GetMapping("/books/{bookId}")
-    public String getOneBook(@PathVariable("bookId") Long id, Model model) {
+    public String getOneBook(@PathVariable("bookId") Long id, HttpSession s, Model model) {
     	//FINDING
     	Book thisBook = bookService.findBook(id); 
+    	Long userId = (Long) s.getAttribute("user_id");
+    	User thisUser = userServ.findOne(userId);
     	//PASS TO JSP
     	model.addAttribute("thisBook", thisBook);
     	model.addAttribute("user", thisBook.getUser());
+    	model.addAttribute("userCon", thisUser.getUserName());
+    	model.addAttribute("userEdit", thisBook.getUser().getUserName());
     	return "/books/show.jsp";
     }
     
@@ -78,6 +82,30 @@ public class MainController {
     	   book.setUser(thisUser);
     	   //crate the book!
            bookService.createBook(book);
+           return "redirect:/home";
+       }
+   }
+   
+   //--------EDIT BOOK---------//
+   @RequestMapping("/books/{Id}/edit")
+   public String edit(@PathVariable("Id") Long id, Model model) {
+       Book book = bookService.findBook(id);
+       model.addAttribute("book", book);
+       return "/books/edit.jsp";
+   }
+   
+   @RequestMapping(value="/books/{id}", method=RequestMethod.PUT)
+   public String update(@Valid @ModelAttribute("book") Book book, HttpSession s, BindingResult result) {
+	   //Finding logged user//
+	   //Not having this created a bug because when the book was being updated it wasnt assigned a user.
+	   Long userID = (Long) s.getAttribute("user_id");
+       User thisUser = userServ.findOne(userID);
+	   //finding the user by Id
+	   if (result.hasErrors()) {
+           return "/books/edit.jsp";
+       } else {
+    	   book.setUser(thisUser);
+           bookService.updateBook(book);
            return "redirect:/home";
        }
    }

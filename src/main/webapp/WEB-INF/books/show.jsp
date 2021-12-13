@@ -19,7 +19,7 @@
 <script src="/webjars/bootstrap/js/bootstrap.min.js"></script>
 
 <meta charset="UTF-8">
-<title>Insert title here</title>
+<title>${thisBook.title}</title>
 </head>
 <body>
 	<div class="container" style="
@@ -43,6 +43,10 @@
 		<hr>
 			<p>Here are ${user.getUserName()}'s thoughts: </p>
 			<p>"${thisBook.thoughts}"</p>
+			
+		<c:if test="${userCon.contains(userEdit) == true}">
+			<a href="/books/${thisBook.id}/edit">Edit Book!</a>
+		</c:if>
 	</div>
 </body>
 </html>
